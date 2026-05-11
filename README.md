@@ -89,4 +89,6 @@ docker compose exec adl adl createsuperuser
 The `adl`command is shorthand for `python manage.py` command. You can use it to run any Django management command
 inside the container.
 
+### User Guide
 
+Check the [User Guide](./docs/user_guide.md) for instructions on how use the plugin on ADL admin interface.
