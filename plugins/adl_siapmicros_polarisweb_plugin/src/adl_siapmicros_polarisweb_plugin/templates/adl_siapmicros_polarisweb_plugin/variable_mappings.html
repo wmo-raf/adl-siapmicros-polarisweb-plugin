@@ -1,0 +1,80 @@
+{% extends "wagtailadmin/generic/base.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block main_content %}
+    <h1>{% trans "Variable Mappings" %} — {{ connection.name }}</h1>
+    <p class="help-block">
+        {% trans "Define how Polaris measures map to ADL parameters for this connection. These mappings apply to all stations using this connection." %}
+    </p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="messages">
+                <ul>
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <table class="listing">
+            <thead>
+            <tr>
+                <th>{% trans "ADL Parameter" %}</th>
+                <th>{% trans "Polaris Measure" %}</th>
+                <th>{% trans "Polaris Measure Unit" %}</th>
+                <th>{% trans "Delete" %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for form in formset %}
+                <tr class="{% if form.errors %}error{% endif %}">
+                    {{ form.id }}
+                    <td>
+                        {{ form.adl_parameter }}
+                        {% if form.adl_parameter.errors %}
+                            <p class="error-message">{{ form.adl_parameter.errors|join:", " }}</p>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ form.polaris_measure_id }}
+                        {% if form.polaris_measure_id.errors %}
+                            <p class="error-message">{{ form.polaris_measure_id.errors|join:", " }}</p>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ form.polaris_measure_unit }}
+                        {% if form.polaris_measure_unit.errors %}
+                            <p class="error-message">{{ form.polaris_measure_unit.errors|join:", " }}</p>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if form.instance.pk %}
+                            {{ form.DELETE }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if formset.non_form_errors %}
+            <div class="error-message">
+                {{ formset.non_form_errors }}
+            </div>
+        {% endif %}
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+            <button type="submit" class="button button-primary">
+                {% trans "Save Mappings" %}
+            </button>
+            <a href="javascript:history.back()" class="button button-secondary">
+                {% trans "Back" %}
+            </a>
+        </div>
+    </form>
+{% endblock %}
