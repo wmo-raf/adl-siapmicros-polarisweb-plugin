@@ -1,6 +1,6 @@
 {
   "name": "ADL SIAPMicros PolarisWeb Plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An ADL Plugin for collecting observation data from SIAP+Micros Polaris Web API",
   "author": "TODO",
   "author_url": "TODO",

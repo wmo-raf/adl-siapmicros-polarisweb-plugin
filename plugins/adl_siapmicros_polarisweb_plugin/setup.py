@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 PROJECT_DIR = os.path.dirname(__file__)
 REQUIREMENTS_DIR = os.path.join(PROJECT_DIR, "requirements")
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 
 def get_requirements(env):
@@ -22,7 +22,7 @@ install_requires = get_requirements("base")
 setup(
     name="adl-siapmicros-polarisweb-plugin",
     version=VERSION,
-    url="https://github.com/adl-siapmicros/polarisweb-plugin",
+    url="https://github.com/wmo-raf/adl-siapmicros-polarisweb-plugin",
     author="WMO RAF",
     author_email="eotenyo@wmo.int",
     license="MIT",
