@@ -39,11 +39,21 @@ class PolarisWebPlugin(Plugin):
             )
             return []
 
-        records = client.get_measurements(
+        records, sources_count = client.get_measurements(
             station_id=station_link.polaris_station_id,
             measure_ids=measure_ids,
             start_date=start_date,
             end_date=end_date,
         )
+
+        # Duck-typed sources-count handover: core stores this on the run's
+        # activity log so "looked, found nothing" (0) stays distinguishable
+        # from "never looked" (None). Committed only here, once the response
+        # is parsed — a call that raised, or the early return above, leaves the
+        # attribute None, and core's evidence rule abstains on NULL rather
+        # than blaming the source for a run that never asked it anything.
+        if getattr(station_link, "adl_sources_count", None) is None:
+            station_link.adl_sources_count = 0
+        station_link.adl_sources_count += sources_count
 
         return records
