@@ -4,7 +4,7 @@ from django.urls import reverse
 
 class PolarisStationSelectWidget(Widget):
     template_name = "adl_siapmicros_polarisweb_plugin/widgets/polaris_station_select_widget.html"
-    
+
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context.update({
@@ -15,7 +15,7 @@ class PolarisStationSelectWidget(Widget):
 
 class PolarisMeasureSelectWidget(Widget):
     template_name = "adl_siapmicros_polarisweb_plugin/widgets/polaris_measure_select_widget.html"
-    
+
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context.update({

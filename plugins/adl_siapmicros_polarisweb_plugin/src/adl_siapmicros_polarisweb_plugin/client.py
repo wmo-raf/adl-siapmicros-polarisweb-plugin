@@ -89,7 +89,7 @@ class PolarisWebAPIClient:
         self.base_url = f"{host}{API_ROOT_PATH}"
         self.timeout = timeout
         self.use_cache = use_cache
-        
+
         self.session = requests.Session()
         if retries is not None:
             # Mounted only when asked for. requests' default adapter already
@@ -98,7 +98,7 @@ class PolarisWebAPIClient:
             adapter = requests.adapters.HTTPAdapter(max_retries=retries)
             self.session.mount("https://", adapter)
             self.session.mount("http://", adapter)
-    
+
     def _get(self, path, **kwargs):
         params = kwargs.pop('params', {})
         params['api_token'] = self.api_token
@@ -107,7 +107,7 @@ class PolarisWebAPIClient:
         response = self.session.get(url, params=params, **kwargs)
         _raise_for_status(response)
         return _parsed_body(response)
-    
+
     def _post(self, path, json=None, **kwargs):
         params = kwargs.pop('params', {})
         params['api_token'] = self.api_token
@@ -116,41 +116,41 @@ class PolarisWebAPIClient:
         response = self.session.post(url, json=json, params=params, **kwargs)
         _raise_for_status(response)
         return _parsed_body(response)
-    
+
     def get_stations(self):
         cache_key = f"{self.api_token}-polaris-stations"
         if self.use_cache:
             cached = cache.get(cache_key)
             if cached is not None:
                 return cached
-        
+
         data = self._get(f'/{STATIONS_PATH}', params={'limit': -1})
         stations = _list_from(data, 'items')
-        
+
         stations_by_id = {str(s['id']): s for s in stations}
-        
+
         if self.use_cache:
             cache.set(cache_key, stations_by_id, 86400)
-        
+
         return stations_by_id
-    
+
     def get_base_measures(self):
         cache_key = f"{self.api_token}-polaris-base-measures"
         if self.use_cache:
             cached = cache.get(cache_key)
             if cached is not None:
                 return cached
-        
+
         data = self._get(f'/{BASE_MEASURES_PATH}', params={'limit': -1})
         measures = _list_from(data, 'items')
-        
+
         measures_by_id = {str(m['id']): m for m in measures}
-        
+
         if self.use_cache:
             cache.set(cache_key, measures_by_id, 86400)
-        
+
         return measures_by_id
-    
+
     def get_measurements(self, station_id, measure_ids, start_date, end_date):
         """
         Fetch measurements for a single station and a list of measure IDs.
@@ -172,33 +172,33 @@ class PolarisWebAPIClient:
             f"{station_id}_{measure_id}": DATA_TYPE
             for measure_id in measure_ids
         }
-        
+
         body = {
             "date_start": start_date.strftime(DATE_FORMAT),
             "date_end": end_date.strftime(DATE_FORMAT),
             "measures": measures_map,
         }
-        
+
         data = self._get('/data/series', json=body)
         series_list = _list_from(data, 'series')
-        
+
         # Accumulate all values keyed by timestamp
         records_by_time = {}
         sources_count = 0
-        
+
         for series in series_list:
             measure_id = str(series.get('measure_id'))
             values = series.get('data', {})
-            
+
             # Counted as carried, before the value and timestamp handling
             # below drops anything: those drops are ours, and a source that
             # answered with entries did offer data.
             sources_count += len(values) if isinstance(values, (dict, list)) else 0
-            
+
             for timestamp_str, raw_value in values.items():
                 if raw_value is None:
                     continue
-                
+
                 try:
                     value = float(raw_value)
                 except (TypeError, ValueError):
@@ -207,7 +207,7 @@ class PolarisWebAPIClient:
                         raw_value, measure_id, timestamp_str,
                     )
                     continue
-                
+
                 if timestamp_str not in records_by_time:
                     try:
                         observation_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M")
@@ -215,7 +215,7 @@ class PolarisWebAPIClient:
                         logger.warning("Could not parse timestamp %r", timestamp_str)
                         continue
                     records_by_time[timestamp_str] = {"observation_time": observation_time}
-                
+
                 records_by_time[timestamp_str][measure_id] = value
-        
+
         return list(records_by_time.values()), sources_count
