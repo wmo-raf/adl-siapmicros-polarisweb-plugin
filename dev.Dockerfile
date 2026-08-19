@@ -3,6 +3,9 @@ FROM adl:latest AS base
 
 FROM adl:latest
 
+# groupmod/usermod below need root; the base image ends on a non-root user.
+USER root
+
 ARG PLUGIN_BUILD_UID
 ENV PLUGIN_BUILD_UID=${PLUGIN_BUILD_UID:-9999}
 ARG PLUGIN_BUILD_GID

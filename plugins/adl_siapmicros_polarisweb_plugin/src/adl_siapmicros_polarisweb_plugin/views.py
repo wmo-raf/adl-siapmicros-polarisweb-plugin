@@ -23,48 +23,48 @@ VariableMappingFormSet = inlineformset_factory(
 
 def get_polaris_stations_for_connection(request):
     network_connection_id = request.GET.get("connection_id")
-    
+
     if not network_connection_id:
         return JsonResponse({"error": _("Network connection ID is required.")}, status=400)
-    
+
     network_conn = get_object_or_none(PolarisWebConnection, pk=network_connection_id)
     if not network_conn:
         return JsonResponse(
             {"error": _("The selected connection is not a Polaris Web API Connection.")},
             status=400,
         )
-    
+
     stations_list = get_stations(network_conn)
     return JsonResponse(stations_list, safe=False)
 
 
 def get_polaris_measures_for_connection(request):
     network_connection_id = request.GET.get("connection_id")
-    
+
     if not network_connection_id:
         return JsonResponse({"error": _("Network connection ID is required.")}, status=400)
-    
+
     network_conn = get_object_or_none(PolarisWebConnection, pk=network_connection_id)
     if not network_conn:
         return JsonResponse(
             {"error": _("The selected connection is not a Polaris Web API Connection.")},
             status=400,
         )
-    
+
     measures_list = get_measures(network_conn)
-    
+
     if not measures_list:
         return JsonResponse(
             {"error": _("No measures found for the selected connection.")},
             status=404,
         )
-    
+
     return JsonResponse(measures_list, safe=False)
 
 
 def edit_variable_mappings(request, connection_id):
     connection = get_object_or_404(PolarisWebConnection, pk=connection_id)
-    
+
     # Load measures from API to populate the select widget choices
     try:
         measures_list = get_measures(connection)
@@ -75,7 +75,7 @@ def edit_variable_mappings(request, connection_id):
         logger.error("Failed to fetch measures from Polaris API: %s", e)
         measures_list = []
         measure_choices = [("", "---------")]
-    
+
     if request.method == "POST":
         formset = VariableMappingFormSet(
             request.POST,
@@ -90,7 +90,7 @@ def edit_variable_mappings(request, connection_id):
             instance=connection,
             form_kwargs={"measure_choices": measure_choices},
         )
-    
+
     return render(
         request,
         "adl_siapmicros_polarisweb_plugin/variable_mappings.html",
