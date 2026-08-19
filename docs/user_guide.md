@@ -94,7 +94,7 @@ A **Station Link** connects an ADL station to its corresponding station in the P
 |-----------------------------------|-----------------------------------------------------------------------------------------|
 | **Network Connection**            | Select the Polaris Web connection created in Step 1                                     |
 | **Polaris Station**               | Select the station from the dropdown — populated live from the API                      |
-| **Initial Collection Start Date** | Optional. Set a past date to backfill historical data. Leave blank to collect from now. |
+| **Collection Start Date**         | Optional. Collection never starts before this date — set a past date to backfill, or move it forward to skip a gap. Leave blank to start from the last 24 hours. |
 
 4. Click **Save**.
 
@@ -140,5 +140,5 @@ docker compose logs adl_celery_worker --tail=100
 
 - Confirm the station link has been saved and the correct Polaris Station is selected.
 - Check that at least one Variable Mapping is configured for the connection.
-- Verify the **Initial Collection Start Date** is set correctly if backfilling.
+- Verify the **Collection Start Date** is set correctly if backfilling.
 - Check Celery worker logs for errors.
