@@ -11,15 +11,17 @@ DATA_TYPE = "val_data"
 
 
 class PolarisWebAPIClient:
-    def __init__(self, api_token, host, use_cache=True):
+    def __init__(self, api_token, host, timeout=30, use_cache=True):
         host = host.rstrip('/')
         self.api_token = api_token
         self.base_url = f"{host}/api/polaris/"
+        self.timeout = timeout
         self.use_cache = use_cache
     
     def _get(self, path, **kwargs):
         params = kwargs.pop('params', {})
         params['api_token'] = self.api_token
+        kwargs.setdefault('timeout', self.timeout)
         url = f"{self.base_url}{path.lstrip('/')}"
         response = requests.get(url, params=params, **kwargs)
         response.raise_for_status()
@@ -28,6 +30,7 @@ class PolarisWebAPIClient:
     def _post(self, path, json=None, **kwargs):
         params = kwargs.pop('params', {})
         params['api_token'] = self.api_token
+        kwargs.setdefault('timeout', self.timeout)
         url = f"{self.base_url}{path.lstrip('/')}"
         response = requests.post(url, json=json, params=params, **kwargs)
         response.raise_for_status()
