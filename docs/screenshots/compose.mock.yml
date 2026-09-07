@@ -1,0 +1,26 @@
+# Extra services for the documentation screenshot harness, merged into the
+# plugin's dev stack by adl's scripts/capture-plugin-docs.sh.
+#
+# The alias is a dotted name under .test rather than the bare service name:
+# the connection's Host is a URLField, which rejects a bare hostname, and the
+# host is printed in every diagnostic message the guide captures — a
+# real-looking demo name reads better there than "mock_polaris".
+services:
+  mock_polaris:
+    build: docs/screenshots/mock-api
+    image: adl-docs-mock-polaris
+    container_name: adl-siapmicros-polarisweb-plugin-docs-mock-api
+    environment:
+      # must match connection.fields.stations_timezone in fixture.json: the
+      # stub reports in the stations' local time, the way a real server does
+      SAMPLE_TZ: Africa/Nairobi
+    networks:
+      default:
+        aliases:
+          - polarisweb.example.test
+  adl:
+    depends_on:
+      - mock_polaris
+  adl_celery_worker:
+    depends_on:
+      - mock_polaris
