@@ -46,7 +46,7 @@ into the admin forms, so you pick rather than type.
 
 - A running ADL instance (see [Installation](https://adl-tool.readthedocs.io/en/latest/installation.html)).
 - The **Polaris Web host URL** — scheme, host and port, no path
-  (`http://102.218.136.213:88`). Polaris Web servers are commonly reached on
+  (`http://192.0.2.10:88`). Polaris Web servers are commonly reached on
   a non-standard port and often over plain HTTP inside the service's
   network.
 - An **API token** for the server, issued by SIAP+Micros or by whoever
@@ -77,7 +77,7 @@ Plugin-specific fields, under *Polaris Web API Credentials*:
 
 | Field | Required | Default | Description |
 |---|---|---|---|
-| Host | yes | — | The Polaris Web base URL with scheme and port, e.g. `http://102.218.136.213:88`. The plugin appends `/api/polaris/…`. The host and port here are what the network diagnostic dials — the explicit port matters. |
+| Host | yes | — | The Polaris Web base URL with scheme and port, e.g. `http://192.0.2.10:88`. The plugin appends `/api/polaris/…`. The host and port here are what the network diagnostic dials — the explicit port matters. |
 | API Token | yes | — | The token for the server. Sent as the `api_token` query parameter; the plugin never writes it into messages or logs. |
 
 ![Connection form](images/polarisweb_connection_form.png)
@@ -241,30 +241,30 @@ this plugin.
 
 | Check | What it verifies |
 |---|---|
-| Endpoint probe | DNS resolution and TCP reach of the host **and port** in *Host* (`102.218.136.213:88` in the example). Run by the core; the plugin only names the endpoint. |
+| Endpoint probe | DNS resolution and TCP reach of the host **and port** in *Host* (`192.0.2.10:88` in the example). Run by the core; the plugin only names the endpoint. |
 | Connection check | Reads the base-measure catalogue (`/api/polaris/base_measures`) fresh — cache bypassed, 5-second timeout, no retries — with the token, claiming OK only from a parsed list, never from a bare HTTP 200. |
 | Station check | Confirms the configured station id appears in the server's current station list, also bypassing the cache, and reports the upstream name so a valid-but-wrong id is caught. |
 
 ### Feedback catalogue — messages this plugin produces
 
-Messages name the host from *Host* (shown here as `102.218.136.213`) and
+Messages name the host from *Host* (shown here as `192.0.2.10`) and
 paths without the query string, so the token never appears in them. Find
 the message you see:
 
 | Message (example) | Status | Meaning | What to do |
 |---|---|---|---|
-| `102.218.136.213 accepted our credentials and returned 38 base measure(s).` | OK | Token valid; the catalogue is readable. The count is the number of measures the server defines. | Nothing — healthy. |
+| `192.0.2.10 accepted our credentials and returned 38 base measure(s).` | OK | Token valid; the catalogue is readable. The count is the number of measures the server defines. | Nothing — healthy. |
 | `Station 12 found upstream as "Conakry Aéroport".` | OK | The id exists on the server; the name is shown so you can confirm it is the station you meant. | Check the name matches your intended station. |
 | `Station 12 was found in the source's station list.` | OK | As above, but the server gave the station no name. | Nothing. |
-| `102.218.136.213 returned HTTP 401 for /api/polaris/base_measures.` | FAILED | The server rejected the token. | Re-enter *API Token*. |
-| `102.218.136.213 returned HTTP 403 for /api/polaris/base_measures.` | FAILED | Token accepted but lacks permission. | Ask the server administrator about the token's rights. |
-| `102.218.136.213 returned HTTP 404 for /api/polaris/base_measures.` | FAILED | Nothing answers at that path — *Host* points to the wrong place (a path in the URL, or another web server on that port). | Fix *Host*: scheme, host and port only. |
-| `102.218.136.213 returned HTTP 5xx for /api/polaris/base_measures.` | FAILED | The Polaris server errored. | Check the server with its administrator. |
-| `102.218.136.213 answered, but the response was not a base-measure list.` | FAILED | Something responded, but not the API — a login page, a proxy, or a body without an `items` list. | Check *Host* and any proxy between ADL and the server. |
-| `102.218.136.213 could not be reached: <error>` | FAILED | Network-level failure: DNS, refused port, or timeout. The wrapped error says which. | Check connectivity from the ADL host to the host and port. |
+| `192.0.2.10 returned HTTP 401 for /api/polaris/base_measures.` | FAILED | The server rejected the token. | Re-enter *API Token*. |
+| `192.0.2.10 returned HTTP 403 for /api/polaris/base_measures.` | FAILED | Token accepted but lacks permission. | Ask the server administrator about the token's rights. |
+| `192.0.2.10 returned HTTP 404 for /api/polaris/base_measures.` | FAILED | Nothing answers at that path — *Host* points to the wrong place (a path in the URL, or another web server on that port). | Fix *Host*: scheme, host and port only. |
+| `192.0.2.10 returned HTTP 5xx for /api/polaris/base_measures.` | FAILED | The Polaris server errored. | Check the server with its administrator. |
+| `192.0.2.10 answered, but the response was not a base-measure list.` | FAILED | Something responded, but not the API — a login page, a proxy, or a body without an `items` list. | Check *Host* and any proxy between ADL and the server. |
+| `192.0.2.10 could not be reached: <error>` | FAILED | Network-level failure: DNS, refused port, or timeout. The wrapped error says which. | Check connectivity from the ADL host to the host and port. |
 | `Station 12 was not found in the source's station list.` | FAILED | Positive proof the id is absent — the station was removed or renumbered on the server. | Re-select the station on the station link form. |
-| `102.218.136.213 answered, but the response was not a station list.` | FAILED | The station listing came back in an unexpected shape. | Check *Host*; report if persistent. |
-| `Could not read the station list from 102.218.136.213: <error>` | FAILED | The station check could not fetch the list, so it proves nothing about this station. | Fix the connection-level failure first, then re-check. |
+| `192.0.2.10 answered, but the response was not a station list.` | FAILED | The station listing came back in an unexpected shape. | Check *Host*; report if persistent. |
+| `Could not read the station list from 192.0.2.10: <error>` | FAILED | The station check could not fetch the list, so it proves nothing about this station. | Fix the connection-level failure first, then re-check. |
 
 ## Troubleshooting
 

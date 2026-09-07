@@ -39,7 +39,10 @@ class PolarisWebConnection(NetworkConnection):
 
     host = models.URLField(
         verbose_name=_("Host"),
-        help_text=_("e.g. http://102.218.136.213:88"),
+        # RFC 5737 documentation address, deliberately: this string is on
+        # screen in every operator's admin and in the plugin guide's
+        # screenshot, and it used to be a live national deployment's IP.
+        help_text=_("e.g. http://192.0.2.10:88"),
     )
     api_token = models.CharField(max_length=512, verbose_name=_("API Token"))
 
