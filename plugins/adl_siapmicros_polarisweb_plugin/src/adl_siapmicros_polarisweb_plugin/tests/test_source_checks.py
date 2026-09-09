@@ -27,7 +27,7 @@ from adl_siapmicros_polarisweb_plugin.plugins import PolarisWebPlugin
 
 NOT_JSON = object()
 
-HOST = "http://102.218.136.213:88"
+HOST = "http://192.0.2.10:88"
 
 START = datetime(2026, 8, 1, tzinfo=timezone.utc)
 END = datetime(2026, 8, 2, tzinfo=timezone.utc)
@@ -130,7 +130,7 @@ class GetSourceEndpointTests(SimpleTestCase):
     def test_honours_the_explicit_port(self):
         # The field's own help text gives an IP literal on port 88, so this is
         # the ordinary case here rather than the exotic one.
-        self.assertEqual(make_connection().get_source_endpoint(), ("102.218.136.213", 88))
+        self.assertEqual(make_connection().get_source_endpoint(), ("192.0.2.10", 88))
 
     def test_falls_back_to_443_for_https_without_a_port(self):
         connection = make_connection(host="https://polaris.example.test")
@@ -160,7 +160,7 @@ class CheckSourceTests(SimpleTestCase):
         result, _calls = self.run_check(FakeAPIClient(measures={"105": {"name": "Air temperature"}}))
         self.assertEqual(result.status, SourceCheckStatus.OK)
         self.assertIsNone(result.category)
-        self.assertIn("102.218.136.213", result.message)
+        self.assertIn("192.0.2.10", result.message)
         self.assertIn("1", result.message)
 
     def test_bypasses_the_cache_and_bounds_the_call(self):

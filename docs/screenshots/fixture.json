@@ -1,0 +1,76 @@
+{
+  "capture": {
+    "connection": "Polaris Web (demo)",
+    "ingest": true,
+    "probe": true,
+    "station_checks": [
+      "DEMO001",
+      "DEMO002"
+    ],
+    "wait": 240,
+    "present_interval": 15
+  },
+  "connection": {
+    "model": "adl_siapmicros_polarisweb_plugin.PolarisWebConnection",
+    "fields": {
+      "name": "Polaris Web (demo)",
+      "plugin": "adl_siapmicros_polarisweb_plugin",
+      "stations_timezone": "Africa/Nairobi",
+      "plugin_processing_interval": 1,
+      "host": "$ENV:POLARISWEB_HOST|http://polarisweb.example.test",
+      "api_token": "$ENV:POLARISWEB_API_TOKEN|demo-polaris-token"
+    },
+    "children": {
+      "variable_mappings": [
+        {
+          "adl_parameter": "Air Temperature",
+          "polaris_measure_id": 101,
+          "polaris_measure_unit": "degC"
+        },
+        {
+          "adl_parameter": "Relative Humidity",
+          "polaris_measure_id": 102,
+          "polaris_measure_unit": "percent"
+        },
+        {
+          "adl_parameter": "Atmospheric Pressure",
+          "polaris_measure_id": 103,
+          "polaris_measure_unit": "hPa"
+        },
+        {
+          "adl_parameter": "Precipitation",
+          "polaris_measure_id": 104,
+          "polaris_measure_unit": "mm"
+        },
+        {
+          "adl_parameter": "Wind Speed",
+          "polaris_measure_id": 106,
+          "polaris_measure_unit": "m/s"
+        },
+        {
+          "adl_parameter": "Wind Direction",
+          "polaris_measure_id": 107,
+          "polaris_measure_unit": "degree"
+        }
+      ]
+    }
+  },
+  "station_links": [
+    {
+      "model": "adl_siapmicros_polarisweb_plugin.PolarisWebStationLink",
+      "station": "DEMO001",
+      "fields": {
+        "polaris_station_id": "$ENV:POLARISWEB_STATION_ID_1|101",
+        "start_date": "$NOW-1d"
+      }
+    },
+    {
+      "model": "adl_siapmicros_polarisweb_plugin.PolarisWebStationLink",
+      "station": "DEMO002",
+      "fields": {
+        "polaris_station_id": "$ENV:POLARISWEB_STATION_ID_2|102",
+        "start_date": "$NOW-1d"
+      }
+    }
+  ]
+}

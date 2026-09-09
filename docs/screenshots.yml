@@ -1,0 +1,83 @@
+# Screenshot manifest for the ADL SIAPMicros PolarisWeb Plugin guide (docs/guide.md).
+# Regenerate from the adl repo:  scripts/capture-plugin-docs.sh ../adl-plugins/adl-siapmicros-polarisweb-plugin
+# Fixture: docs/screenshots/fixture.json (connection 1 = "Polaris Web (demo)", station link 1 = DEMO001).
+# The host is a connection field, so a stub can be pointed at: a small server answering
+# /api/polaris/stations, /api/polaris/base_measures and /api/polaris/data/series with
+# recorded catalogues (docs/screenshots/compose.mock.yml + docs/screenshots/mock-api/ —
+# to be added by the execution pass). Export POLARISWEB_HOST / POLARISWEB_API_TOKEN /
+# POLARISWEB_STATION_ID_1 in docs/screenshots/credentials.env to run against a live server.
+# Format: defaults + screenshots (name/url/setup/callouts/capture), run by adl's
+# docs/screenshots/capture/capture.py; output derives from name: docs/images/<name>.png.
+# Callouts are numbered badges/outlines only — never text in images.
+# Every entry has been run against the stack this file describes.
+#
+# The mock lives in docs/screenshots/mock-api/ and is wired in by
+# docs/screenshots/compose.mock.yml; its catalogue content is transcribed from a
+# real deployment, its ids are demo values, and it reports in the stations'
+# local time. See the header of mock-api/server.py.
+
+defaults:
+  # 1600, not the usual 1440: the variable-mappings table has four columns and
+  # the last of them (Delete, which the guide documents) falls outside a
+  # 1440-wide viewport, where it is reachable only by scrolling the table.
+  viewport:
+  - 1600
+  - 900
+  padding: 12
+screenshots:
+- name: polarisweb_connection_form
+  url: /polariswebconnection/edit/1/
+  setup:
+  - fill: { selector: '#id_api_token', value: '••••••••••••' }
+  callouts:
+  - badge: { target: '#id_host', n: 1 }
+  - badge: { target: '#id_api_token', n: 2 }
+  capture:
+    selector: "#w-editor-form"
+- name: polarisweb_station_link_form
+  url: /polariswebstationlink/edit/1/
+  setup:
+  - wait_until: "document.querySelector('#id_polaris_station_id').options.length > 1"
+  callouts:
+  - badge: { target: '#id_polaris_station_id', n: 1 }
+  - badge: { target: '#id_start_date', n: 2 }
+  capture:
+    selector: "#w-editor-form"
+- name: polarisweb_station_select
+  url: /polariswebstationlink/edit/1/
+  setup:
+  - wait_until: "document.querySelector('#id_polaris_station_id').options.length > 1"
+  callouts:
+  - highlight: '#id_polaris_station_id'
+  capture:
+    selector: '#panel-polaris_station_id-section'
+- name: polarisweb_manage_mappings_button
+  url: /connections/
+  setup:
+  - click: 'table .w-dropdown__toggle'
+  - wait_until: "document.querySelectorAll('a[href*=\"adl-polarisweb-plugin/variable-mappings/\"]').length > 0"
+  callouts:
+  - highlight: a[href*="adl-polarisweb-plugin/variable-mappings/"]
+  capture:
+    selector: '.plugin-panel'
+- name: polarisweb_variable_mappings_page
+  url: /adl-polarisweb-plugin/variable-mappings/1/
+  callouts:
+  - badge: { target: 'table.listing tbody tr:last-child select[name$="-adl_parameter"]', n: 1 }
+  - badge: { target: 'table.listing tbody tr:last-child select[name$="-polaris_measure_id"]', n: 2 }
+  - badge: { target: 'table.listing tbody tr:last-child select[name$="-polaris_measure_unit"]', n: 3 }
+  - badge: { target: 'button.button-primary[type="submit"]', n: 4 }
+  setup:
+  - eval: "fitMain()"
+  capture:
+    selector: main
+- name: polarisweb_ingestion_diagnostic
+  url: /monitoring/connection/1/health/
+  callouts:
+  - highlight: .health-probe-form button
+  capture:
+    selector: .health-diagnostic
+- name: polarisweb_station_source_check
+  url: /polariswebstationlink/inspect/1/
+  capture:
+    selector: ":nth-match(.collection-status, 2)"
